@@ -4,6 +4,8 @@ import octoprint.plugin
 from octoprint.events import Events
 from octoprint.util import RepeatedTimer
 
+MIN_FIRMWARE_TEMP_C = 5
+
 
 class MinTempsPlugin(
     octoprint.plugin.SettingsPlugin,
@@ -64,12 +66,16 @@ class MinTempsPlugin(
 
         bed_temp = self._settings.get_int(["bed_temp"])
         tool_targets = self._get_tool_targets()
+        current_temps = self._get_current_temperatures()
 
         if self._settings.get_boolean(["has_bed"]):
-            log("Setting bed minimum temperature to %sC (%s)", bed_temp, reason)
-            self._printer.set_temperature("bed", bed_temp)
+            if not self._is_below_firmware_min("bed", current_temps, reason):
+                log("Setting bed minimum temperature to %sC (%s)", bed_temp, reason)
+                self._printer.set_temperature("bed", bed_temp)
 
         for tool_id, temp in tool_targets:
+            if self._is_below_firmware_min(tool_id, current_temps, reason):
+                continue
             log("Setting %s minimum temperature to %sC (%s)", tool_id, temp, reason)
             self._printer.set_temperature(tool_id, temp)
 
@@ -89,6 +95,40 @@ class MinTempsPlugin(
                 value = 7
             targets.append((key, value))
         return targets
+
+    def _get_current_temperatures(self):
+        try:
+            return self._printer.get_current_temperatures() or {}
+        except Exception:
+            self._logger.exception("Unable to read current temperatures")
+            return {}
+
+    def _get_actual_temp(self, current_temps, heater):
+        if not current_temps:
+            return None
+        entry = current_temps.get(heater)
+        if not entry:
+            return None
+        actual = entry.get("actual")
+        try:
+            return float(actual)
+        except (TypeError, ValueError):
+            return None
+
+    def _is_below_firmware_min(self, heater, current_temps, reason):
+        actual = self._get_actual_temp(current_temps, heater)
+        if actual is None:
+            return False
+        if actual < MIN_FIRMWARE_TEMP_C:
+            self._logger.warning(
+                "%s temperature %.1fC below %sC minimum; skipping (%s)",
+                heater,
+                actual,
+                MIN_FIRMWARE_TEMP_C,
+                reason,
+            )
+            return True
+        return False
 
     def _restart_timer(self):
         self._stop_timer()
@@ -155,7 +195,7 @@ __plugin_name__ = "MinTemps"
 __plugin_description__ = (
     "Keep bed and hotend heaters at a minimum temperature after prints."
 )
-__plugin_version__ = "0.2.0"
+__plugin_version__ = "0.2.1"
 __plugin_pythoncompat__ = ">=3,<4"
 
 

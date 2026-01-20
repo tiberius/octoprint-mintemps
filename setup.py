@@ -4,7 +4,7 @@ from setuptools import setup
 plugin_identifier = "mintemps"
 plugin_package = "octoprint_mintemps"
 plugin_name = "OctoPrint-MinTemps"
-plugin_version = "0.2.0"
+plugin_version = "0.2.1"
 plugin_description = (
     "Keep bed and hotend heaters at a minimum temperature after prints."
 )

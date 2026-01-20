@@ -31,6 +31,8 @@ is operational and enabled, sets:
 - Tools: `tool_temps` (tool0, tool1, ...)
 
 It also runs periodic enforcement while idle using the configured interval.
+If a heater's current temperature reads below 5 C, the plugin skips applying
+the minimum to avoid firmware min-temp errors.
 
 ## Project outline and feature ideas
 
