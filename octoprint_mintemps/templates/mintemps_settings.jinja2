@@ -1,0 +1,33 @@
+<div class="control-group">
+  <label class="control-label" for="mintemps-bed-temp">
+    Bed minimum temperature (C)
+  </label>
+  <div class="controls">
+    <input
+      id="mintemps-bed-temp"
+      type="number"
+      min="0"
+      step="1"
+      data-bind="value: settings.plugins.mintemps.bed_temp"
+    />
+  </div>
+</div>
+
+<div class="control-group">
+  <label class="control-label" for="mintemps-tool-temp">
+    Hotend minimum temperature (C)
+  </label>
+  <div class="controls">
+    <input
+      id="mintemps-tool-temp"
+      type="number"
+      min="0"
+      step="1"
+      data-bind="value: settings.plugins.mintemps.tool_temp"
+    />
+  </div>
+</div>
+
+<p class="muted">
+  Applied after a print finishes, fails, or is cancelled.
+</p>
