@@ -9,7 +9,6 @@ temperatures can drop below about 5 C.
 
 - Provides settings to configure minimum bed and per-tool temperatures.
 - Defaults all minimums to 7 C.
-- Includes a disable toggle (defaults to enabled).
 - After a print is done, cancelled, or failed, the plugin re-applies the
   configured minimum temperatures.
 - Periodically re-applies the minimums while the printer is idle.

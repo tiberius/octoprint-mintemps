@@ -4,7 +4,7 @@ from setuptools import setup
 plugin_identifier = "mintemps"
 plugin_package = "octoprint_mintemps"
 plugin_name = "OctoPrint-MinTemps"
-plugin_version = "0.2.1"
+plugin_version = "0.2.2"
 plugin_description = (
     "Keep bed and hotend heaters at a minimum temperature after prints."
 )
@@ -21,7 +21,7 @@ setup(
     license=plugin_license,
     packages=[plugin_package],
     include_package_data=True,
-    package_data={plugin_package: ["templates/*.jinja2", "static/js/*.js"]},
+    package_data={plugin_package: ["templates/*.jinja2"]},
     install_requires=plugin_requires,
     entry_points={"octoprint.plugin": [f"{plugin_identifier} = {plugin_package}"]},
 )

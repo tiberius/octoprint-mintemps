@@ -11,7 +11,6 @@ class MinTempsPlugin(
     octoprint.plugin.SettingsPlugin,
     octoprint.plugin.TemplatePlugin,
     octoprint.plugin.EventHandlerPlugin,
-    octoprint.plugin.AssetPlugin,
     octoprint.plugin.StartupPlugin,
     octoprint.plugin.ShutdownPlugin,
 ):
@@ -20,7 +19,6 @@ class MinTempsPlugin(
 
     def get_settings_defaults(self):
         return {
-            "disabled": False,
             "bed_temp": 7,
             "tool_temps": {},
             "tool_count": 1,
@@ -31,8 +29,14 @@ class MinTempsPlugin(
     def get_template_configs(self):
         return [dict(type="settings", custom_bindings=False)]
 
-    def get_assets(self):
-        return {"js": ["js/mintemps.js"]}
+    def get_template_vars(self):
+        tool_count = self._settings.get_int(["tool_count"])
+        if tool_count <= 0:
+            tool_count = 1
+        return {
+            "tool_count": tool_count,
+            "has_bed": self._settings.get_boolean(["has_bed"]),
+        }
 
     def on_after_startup(self):
         self._sync_printer_profile_settings()
@@ -51,9 +55,6 @@ class MinTempsPlugin(
             self._apply_min_temps(reason=event)
 
     def _apply_min_temps(self, reason):
-        if self._settings.get_boolean(["disabled"]):
-            return
-
         if not self._printer or not self._printer.is_operational():
             return
 
@@ -195,7 +196,7 @@ __plugin_name__ = "MinTemps"
 __plugin_description__ = (
     "Keep bed and hotend heaters at a minimum temperature after prints."
 )
-__plugin_version__ = "0.2.1"
+__plugin_version__ = "0.2.2"
 __plugin_pythoncompat__ = ">=3,<4"
 
 
