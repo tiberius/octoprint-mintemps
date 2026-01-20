@@ -1,0 +1,63 @@
+{% set resolved_tool_count = tool_count|default(1, true)|int %}
+{% if resolved_tool_count < 1 %}
+  {% set resolved_tool_count = 1 %}
+{% endif %}
+{% set resolved_has_bed = has_bed|default(true) %}
+
+{% if resolved_has_bed %}
+<div class="control-group">
+  <label class="control-label" for="mintemps-bed-temp">
+    Bed minimum temperature (C)
+  </label>
+  <div class="controls">
+    <input
+      id="mintemps-bed-temp"
+      type="number"
+      min="0"
+      step="1"
+      data-bind="value: settings.plugins.mintemps.bed_temp"
+    />
+  </div>
+</div>
+{% endif %}
+
+{% for index in range(resolved_tool_count) %}
+<div class="control-group">
+  <label
+    class="control-label"
+    for="mintemps-tool-{{ index }}"
+  >
+    Tool {{ index }} minimum temperature (C)
+  </label>
+  <div class="controls">
+    <input
+      id="mintemps-tool-{{ index }}"
+      type="number"
+      min="0"
+      step="1"
+      data-bind="value: settings.plugins.mintemps.tool_temps.tool{{ index }}"
+    />
+  </div>
+</div>
+{% endfor %}
+
+<div class="control-group">
+  <label class="control-label" for="mintemps-interval">
+    Periodic enforcement interval (seconds)
+  </label>
+  <div class="controls">
+    <input
+      id="mintemps-interval"
+      type="number"
+      min="0"
+      step="10"
+      data-bind="value: settings.plugins.mintemps.enforce_interval_sec"
+    />
+    <p class="muted">Set to 0 to disable periodic enforcement.</p>
+  </div>
+</div>
+
+<p class="muted">
+  Applied after a print finishes, fails, or is cancelled. Periodic enforcement
+  runs while idle.
+</p>
