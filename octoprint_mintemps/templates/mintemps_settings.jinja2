@@ -1,4 +1,17 @@
 <div class="control-group">
+  <label class="control-label" for="mintemps-disable-toggle">
+    Disable minimum temperature enforcement
+  </label>
+  <div class="controls">
+    <input
+      id="mintemps-disable-toggle"
+      type="checkbox"
+      data-bind="checked: settings.plugins.mintemps.disabled"
+    />
+  </div>
+</div>
+
+<div class="control-group" data-bind="visible: hasBed">
   <label class="control-label" for="mintemps-bed-temp">
     Bed minimum temperature (C)
   </label>
@@ -8,26 +21,45 @@
       type="number"
       min="0"
       step="1"
-      data-bind="value: settings.plugins.mintemps.bed_temp"
+      data-bind="value: settings.plugins.mintemps.bed_temp, enable: !$root.settings.plugins.mintemps.disabled()"
     />
   </div>
 </div>
 
+<!-- ko foreach: toolSettings -->
 <div class="control-group">
-  <label class="control-label" for="mintemps-tool-temp">
-    Hotend minimum temperature (C)
-  </label>
+  <label
+    class="control-label"
+    data-bind="text: label, attr: { for: 'mintemps-' + key }"
+  ></label>
   <div class="controls">
     <input
-      id="mintemps-tool-temp"
       type="number"
       min="0"
       step="1"
-      data-bind="value: settings.plugins.mintemps.tool_temp"
+      data-bind="value: temp, attr: { id: 'mintemps-' + key }, enable: !$root.settings.plugins.mintemps.disabled()"
     />
+  </div>
+</div>
+<!-- /ko -->
+
+<div class="control-group">
+  <label class="control-label" for="mintemps-interval">
+    Periodic enforcement interval (seconds)
+  </label>
+  <div class="controls">
+    <input
+      id="mintemps-interval"
+      type="number"
+      min="0"
+      step="10"
+      data-bind="value: settings.plugins.mintemps.enforce_interval_sec"
+    />
+    <p class="muted">Set to 0 to disable periodic enforcement.</p>
   </div>
 </div>
 
 <p class="muted">
-  Applied after a print finishes, fails, or is cancelled.
+  Applied after a print finishes, fails, or is cancelled. Periodic enforcement
+  runs while idle.
 </p>
