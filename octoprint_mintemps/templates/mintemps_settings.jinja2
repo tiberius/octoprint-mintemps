@@ -1,4 +1,10 @@
-{% if has_bed %}
+{% set resolved_tool_count = tool_count|default(1, true)|int %}
+{% if resolved_tool_count < 1 %}
+  {% set resolved_tool_count = 1 %}
+{% endif %}
+{% set resolved_has_bed = has_bed|default(true) %}
+
+{% if resolved_has_bed %}
 <div class="control-group">
   <label class="control-label" for="mintemps-bed-temp">
     Bed minimum temperature (C)
@@ -15,7 +21,7 @@
 </div>
 {% endif %}
 
-{% for index in range(tool_count) %}
+{% for index in range(resolved_tool_count) %}
 <div class="control-group">
   <label
     class="control-label"

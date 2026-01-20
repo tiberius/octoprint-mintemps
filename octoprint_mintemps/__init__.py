@@ -196,7 +196,7 @@ __plugin_name__ = "MinTemps"
 __plugin_description__ = (
     "Keep bed and hotend heaters at a minimum temperature after prints."
 )
-__plugin_version__ = "0.2.2"
+__plugin_version__ = "0.2.3"
 __plugin_pythoncompat__ = ">=3,<4"
 
 
