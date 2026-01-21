@@ -6,6 +6,11 @@ semantic versioning.
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-01-21
+### Fixed
+- Skip applying minimums when a heater has no temperature reading.
+- Use each heater's actual temperature reading for min-temp checks.
+
 ## [0.2.3] - 2026-01-20
 ### Fixed
 - Default tool count/bed values in the settings template to avoid Jinja errors.

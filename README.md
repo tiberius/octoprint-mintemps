@@ -31,7 +31,8 @@ is operational and enabled, sets:
 
 It also runs periodic enforcement while idle using the configured interval.
 If a heater's current temperature reads below 5 C, the plugin skips applying
-the minimum to avoid firmware min-temp errors.
+the minimum to avoid firmware min-temp errors. Each heater uses its own actual
+temperature reading, and heaters with missing readings are skipped.
 
 ## Project outline and feature ideas
 

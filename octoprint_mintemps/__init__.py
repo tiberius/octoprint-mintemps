@@ -68,14 +68,15 @@ class MinTempsPlugin(
         bed_temp = self._settings.get_int(["bed_temp"])
         tool_targets = self._get_tool_targets()
         current_temps = self._get_current_temperatures()
+        actual_temps = self._get_actual_temperatures(current_temps)
 
         if self._settings.get_boolean(["has_bed"]):
-            if not self._is_below_firmware_min("bed", current_temps, reason):
+            if not self._is_below_firmware_min("bed", actual_temps, reason):
                 log("Setting bed minimum temperature to %sC (%s)", bed_temp, reason)
                 self._printer.set_temperature("bed", bed_temp)
 
         for tool_id, temp in tool_targets:
-            if self._is_below_firmware_min(tool_id, current_temps, reason):
+            if self._is_below_firmware_min(tool_id, actual_temps, reason):
                 continue
             log("Setting %s minimum temperature to %sC (%s)", tool_id, temp, reason)
             self._printer.set_temperature(tool_id, temp)
@@ -104,22 +105,31 @@ class MinTempsPlugin(
             self._logger.exception("Unable to read current temperatures")
             return {}
 
-    def _get_actual_temp(self, current_temps, heater):
+    def _get_actual_temperatures(self, current_temps):
         if not current_temps:
-            return None
-        entry = current_temps.get(heater)
-        if not entry:
-            return None
-        actual = entry.get("actual")
+            return {}
+        actuals = {}
+        for heater, entry in current_temps.items():
+            if not isinstance(entry, dict):
+                continue
+            actual = self._coerce_temperature(entry.get("actual"))
+            if actual is not None:
+                actuals[heater] = actual
+        return actuals
+
+    def _coerce_temperature(self, value):
         try:
-            return float(actual)
+            return float(value)
         except (TypeError, ValueError):
             return None
 
-    def _is_below_firmware_min(self, heater, current_temps, reason):
-        actual = self._get_actual_temp(current_temps, heater)
+    def _is_below_firmware_min(self, heater, actual_temps, reason):
+        actual = actual_temps.get(heater)
         if actual is None:
-            return False
+            self._logger.debug(
+                "No temperature reading for %s; skipping (%s)", heater, reason
+            )
+            return True
         if actual < MIN_FIRMWARE_TEMP_C:
             self._logger.warning(
                 "%s temperature %.1fC below %sC minimum; skipping (%s)",
@@ -196,7 +206,7 @@ __plugin_name__ = "MinTemps"
 __plugin_description__ = (
     "Keep bed and hotend heaters at a minimum temperature after prints."
 )
-__plugin_version__ = "0.2.3"
+__plugin_version__ = "0.2.4"
 __plugin_pythoncompat__ = ">=3,<4"
 
 
