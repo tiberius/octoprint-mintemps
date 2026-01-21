@@ -3,7 +3,7 @@
 OctoPrint-MinTemps is a plugin that keeps the bed and hotend heaters at a
 minimum temperature after a print finishes and periodically while idle. This
 helps avoid firmware protection shutdowns in cold environments where
-temperatures can drop below about 5 C.
+temperatures can drop below about 6 C.
 
 ## MVP behavior
 
@@ -30,9 +30,10 @@ is operational and enabled, sets:
 - Tools: `tool_temps` (tool0, tool1, ...)
 
 It also runs periodic enforcement while idle using the configured interval.
-If a heater's current temperature reads below 5 C, the plugin skips applying
+If a heater's current temperature reads below 6 C, the plugin skips applying
 the minimum to avoid firmware min-temp errors. Each heater uses its own actual
-temperature reading, and heaters with missing readings are skipped.
+temperature reading, and heaters with missing readings are skipped. The plugin
+also requires multiple consecutive safe readings before it applies minimums.
 
 ## Project outline and feature ideas
 

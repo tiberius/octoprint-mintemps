@@ -6,6 +6,12 @@ semantic versioning.
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-01-21
+### Changed
+- Raised firmware minimum check threshold to 6 C.
+### Added
+- Require multiple consecutive safe readings before applying minimum temps.
+
 ## [0.2.4] - 2026-01-21
 ### Fixed
 - Skip applying minimums when a heater has no temperature reading.
