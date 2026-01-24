@@ -6,6 +6,12 @@ semantic versioning.
 
 ## [Unreleased]
 
+## [0.2.6] - 2026-01-24
+### Added
+- Avoid overwriting higher manual target temperatures when applying minimums.
+### Changed
+- Default per-tool minimums now mirror the configured bed minimum.
+
 ## [0.2.5] - 2026-01-21
 ### Changed
 - Raised firmware minimum check threshold to 6 C.
