@@ -71,14 +71,15 @@ class MinTempsPlugin(
         tool_targets = self._get_tool_targets()
         current_temps = self._get_current_temperatures()
         actual_temps = self._get_actual_temperatures(current_temps)
+        target_temps = self._get_target_temperatures(current_temps)
 
         if self._settings.get_boolean(["has_bed"]):
-            if self._is_safe_and_stable("bed", actual_temps, reason):
+            if self._should_apply_min("bed", bed_temp, target_temps, actual_temps, reason):
                 log("Setting bed minimum temperature to %sC (%s)", bed_temp, reason)
                 self._printer.set_temperature("bed", bed_temp)
 
         for tool_id, temp in tool_targets:
-            if self._is_safe_and_stable(tool_id, actual_temps, reason):
+            if self._should_apply_min(tool_id, temp, target_temps, actual_temps, reason):
                 log("Setting %s minimum temperature to %sC (%s)", tool_id, temp, reason)
                 self._printer.set_temperature(tool_id, temp)
 
@@ -119,6 +120,18 @@ class MinTempsPlugin(
                 actuals[heater] = actual
         return actuals
 
+    def _get_target_temperatures(self, current_temps):
+        if not current_temps:
+            return {}
+        targets = {}
+        for heater, entry in current_temps.items():
+            if not isinstance(entry, dict):
+                continue
+            target = self._coerce_temperature(entry.get("target"))
+            if target is not None:
+                targets[heater] = target
+        return targets
+
     def _coerce_temperature(self, value):
         try:
             return float(value)
@@ -157,6 +170,19 @@ class MinTempsPlugin(
             )
             return False
         return True
+
+    def _should_apply_min(self, heater, min_temp, target_temps, actual_temps, reason):
+        target = target_temps.get(heater)
+        if target is not None and target >= min_temp:
+            self._logger.debug(
+                "%s target %.1fC already >= minimum %sC; skipping (%s)",
+                heater,
+                target,
+                min_temp,
+                reason,
+            )
+            return False
+        return self._is_safe_and_stable(heater, actual_temps, reason)
 
     def _restart_timer(self):
         self._stop_timer()
