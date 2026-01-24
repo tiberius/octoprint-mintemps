@@ -89,13 +89,14 @@ class MinTempsPlugin(
             tool_temps = {}
 
         targets = []
+        default_temp = self._get_default_tool_temp()
         for index in range(tool_count):
             key = "tool{}".format(index)
-            value = tool_temps.get(key, 7)
+            value = tool_temps.get(key, default_temp)
             try:
                 value = int(value)
             except (TypeError, ValueError):
-                value = 7
+                value = default_temp
             targets.append((key, value))
         return targets
 
@@ -198,10 +199,11 @@ class MinTempsPlugin(
             tool_temps = {}
             updated = True
 
+        default_temp = self._get_default_tool_temp()
         for index in range(tool_count):
             key = "tool{}".format(index)
             if key not in tool_temps or tool_temps[key] in (None, ""):
-                tool_temps[key] = 7
+                tool_temps[key] = default_temp
                 updated = True
 
         if updated:
@@ -216,6 +218,13 @@ class MinTempsPlugin(
         except Exception:
             self._logger.exception("Unable to read printer profile")
             return {}
+
+    def _get_default_tool_temp(self):
+        raw_default = self._settings.get(["bed_temp"])
+        try:
+            return int(raw_default)
+        except (TypeError, ValueError):
+            return self.get_settings_defaults().get("bed_temp", 7)
 
 
 __plugin_name__ = "MinTemps"
